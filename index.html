@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es-419">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Protocolo Alpha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #16a34a;
+            --primary-light: #22c55e;
+            --primary-dark: #15803d;
+            --accent: #f0fdf4;
+            --bg: #ffffff;
+            --bg2: #f9fafb;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --text2: #6b7280;
+            --text3: #374151;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Nunito', sans-serif; background: var(--bg2); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+        /* LOGO BAR */
+        .logo-bar { width: 100%; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; padding: 14px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 900; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; box-shadow: 0 3px 12px rgba(22, 163, 74, 0.35); }
+        .logo-text { display: flex; flex-direction: column; line-height: 1; }
+        .logo-p { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--primary); letter-spacing: 3px; }
+        .logo-sub { font-size: 9px; font-weight: 700; color: var(--text2); letter-spacing: 3px; text-transform: uppercase; }
+
+        /* PROGRESS */
+        .progress-wrap { width: 100%; background: #fff; border-bottom: 1px solid var(--border); padding: 10px 20px; display: none; }
+        .progress-wrap.show { display: block; }
+        .progress-meta { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+        .progress-meta span:last-child { color: var(--primary); }
+        .prog-bar { height: 5px; background: #e5e7eb; border-radius: 10px; overflow: hidden; }
+        .prog-fill { height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 10px; transition: width 0.4s ease; }
+
+        /* LAYOUT */
+        .main { width: 100%; max-width: 520px; padding: 24px 16px 40px; }
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeUp 0.35s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-icon { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+        /* CARDS & TYPOGRAPHY */
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+        .headline { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--text); line-height: 1.1; letter-spacing: 1px; margin-bottom: 12px; }
+        .headline .green { color: var(--primary); }
+        .subtext { font-size: 15px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+        .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); border: 1px solid #bbf7d0; color: var(--primary-dark); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; }
+        .q-number { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .q-text { font-size: 20px; font-weight: 900; color: var(--text); line-height: 1.3; margin-bottom: 4px; }
+        .q-hint { font-size: 13px; color: var(--text2); margin-top: 6px; }
+        .divider { height: 1px; background: var(--border); margin: 20px 0; }
+        .info-box { background: var(--accent); border: 1px solid #bbf7d0; border-radius: 14px; padding: 18px; margin: 20px 0; font-size: 14px; color: var(--text3); line-height: 1.6; }
+        .full-img { width: 100%; border-radius: 16px; display: block; margin: 20px 0; }
+
+        /* BUTTONS */
+        .btn { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: #fff; border: none; padding: 18px 24px; border-radius: 14px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 16px; cursor: pointer; width: 100%; letter-spacing: 0.5px; box-shadow: 0 6px 20px rgba(22, 163, 74, 0.35); transition: transform 0.2s, box-shadow 0.2s; }
+        .btn:hover { transform: scale(1.02); box-shadow: 0 8px 28px rgba(22, 163, 74, 0.45); }
+        .btn:active { transform: scale(0.98); }
+
+        /* AGE GRID */
+        .age-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .age-card { border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; background: #fff; position: relative; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .age-card:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .age-card:active { transform: scale(0.98); }
+        .age-card img { width: 100%; height: 300px; object-fit: cover; object-position: center 15%; display: block; }
+        .age-card-label { position: absolute; bottom: 0; left: 0; right: 0; background: var(--primary); padding: 11px 14px; display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 14px; color: #fff; }
+
+        /* OPTIONS */
+        .options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .opt { border: 2px solid var(--border); background: #fff; color: var(--text); padding: 16px 18px; border-radius: 14px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; text-align: left; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+        .opt:hover { border-color: var(--primary); background: var(--accent); color: var(--primary-dark); }
+        .opt.selected { border-color: var(--primary); background: var(--accent); color: var(--primary-dark); }
+        .opt-icon { width: 32px; height: 32px; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .opt.selected .opt-icon { background: #dcfce7; }
+
+        /* MULTI SELECT */
+        .multi-opts { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .multi-opt { border: 2px solid var(--border); background: #fff; color: var(--text); padding: 16px 18px; border-radius: 14px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; text-align: left; transition: all 0.2s; display: flex; align-items: center; gap: 12px; user-select: none; }
+        .multi-opt:hover { border-color: var(--primary); }
+        .multi-opt.selected { border-color: var(--primary); background: var(--accent); color: var(--primary-dark); }
+        .checkbox { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 13px; }
+        .multi-opt.selected .checkbox { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+        /* SCALE */
+        .scale-row { display: flex; gap: 8px; margin-top: 20px; }
+        .scale-btn { flex: 1; border: 2px solid var(--border); background: #fff; border-radius: 12px; padding: 18px 8px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 18px; color: var(--text); transition: all 0.2s; text-align: center; }
+        .scale-btn:hover { border-color: var(--primary); background: var(--accent); color: var(--primary-dark); }
+        .scale-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; color: var(--text2); font-weight: 600; }
+
+        /* TESTIMONIAL */
+        .testi-mini { background: var(--accent); border: 1px solid #bbf7d0; border-radius: 14px; padding: 16px; margin: 16px 0; }
+        .testi-mini-quote { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.5; font-style: italic; margin-bottom: 8px; }
+        .testi-mini-author { font-size: 12px; color: var(--primary-dark); font-weight: 700; }
+        .testi-mini-result { display: inline-block; background: #dcfce7; color: var(--primary-dark); font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; margin-top: 6px; }
+
+        /* ANALYSIS STEPS */
+        .analysis-step { display: flex; align-items: center; gap: 12px; padding: 14px; background: #fff; border: 1px solid var(--border); border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--text2); }
+        .step-icon { font-size: 20px; flex-shrink: 0; }
+        .step-bar-wrap { flex: 1; height: 6px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+        .step-bar { height: 100%; background: var(--primary); width: 0%; transition: width 1s ease; border-radius: 4px; }
+        .step-check { font-size: 16px; color: var(--primary); display: none; flex-shrink: 0; }
+        .step-done .step-check { display: block; }
+        .step-done .step-bar-wrap { display: none; }
+
+        /* OFFER */
+        .offer-hero { text-align: center; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1.5px solid #86efac; border-radius: 18px; padding: 22px 18px 18px; margin-bottom: 20px; }
+        .offer-hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #86efac; border-radius: 20px; padding: 5px 14px; font-size: 10px; font-weight: 900; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        .offer-hero-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; line-height: 1.1; letter-spacing: 1px; color: var(--text); }
+        .offer-hero-title span { color: var(--primary); }
+        .delivery-card { background: #fff; border: 1.5px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+        .delivery-card-label { font-size: 10px; font-weight: 900; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+        .delivery-card-label::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--primary); border-radius: 2px; }
+        .offer-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .offer-item:last-child { border-bottom: none; }
+        .offer-check { width: 28px; height: 28px; background: #dcfce7; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+        .offer-text { flex: 1; }
+        .offer-title { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
+        .offer-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+        .lifetime-badge { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #fef9c3, #fef08a); border: 1.5px solid #fde047; border-radius: 12px; padding: 12px 14px; margin-top: 10px; }
+        .lifetime-badge-text { font-size: 13px; font-weight: 900; color: #713f12; }
+        .lifetime-badge-sub { font-size: 11px; color: #92400e; margin-top: 2px; font-weight: 600; }
+
+        /* BONUS */
+        .bonus-card { background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%); border: 2px solid #6d28d9; border-radius: 18px; padding: 20px 18px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .bonus-card::before { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(124,58,237,.3), transparent 70%); border-radius: 50%; }
+        .bonus-ribbon { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,58,237,.25); border: 1px solid rgba(124,58,237,.5); border-radius: 20px; padding: 5px 14px; font-size: 10px; font-weight: 900; color: #c4b5fd; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .bonus-headline { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #fff; letter-spacing: 1px; line-height: 1.15; margin-bottom: 16px; }
+        .bonus-headline span { color: #a78bfa; }
+        .bonus-item { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.06); border: 1px solid rgba(109,40,217,.35); border-radius: 12px; padding: 13px 14px; margin-bottom: 9px; }
+        .bonus-item:last-child { margin-bottom: 0; }
+        .bonus-emoji-wrap { width: 40px; height: 40px; background: rgba(109,40,217,.25); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .bonus-item-body { flex: 1; }
+        .bonus-item-name { font-size: 13px; font-weight: 900; color: #fff; line-height: 1.3; }
+        .bonus-item-desc { font-size: 11px; color: rgba(255,255,255,.55); margin-top: 2px; line-height: 1.4; }
+        .bonus-gratis { font-size: 9px; font-weight: 900; color: #fbbf24; background: rgba(251,191,36,.15); border: 1px solid rgba(251,191,36,.4); border-radius: 5px; padding: 3px 8px; text-transform: uppercase; letter-spacing: .5px; flex-shrink: 0; white-space: nowrap; }
+
+        /* URGENCY */
+        .urgency-strip { display: flex; align-items: flex-start; gap: 10px; background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 13px 14px; margin-bottom: 20px; }
+        .urgency-icon { font-size: 20px; flex-shrink: 0; animation: shake 2.5s infinite; }
+        @keyframes shake { 0%,85%,100% { transform: rotate(0); } 88% { transform: rotate(-10deg); } 92% { transform: rotate(10deg); } 96% { transform: rotate(-5deg); } }
+        .urgency-text { font-size: 12px; font-weight: 700; color: #92400e; line-height: 1.55; }
+        .urgency-text strong { color: #c2410c; }
+
+        /* CTA */
+        .cta-pulse { display: block; width: 100%; padding: 20px 16px; background: linear-gradient(135deg, #15803d 0%, #22c55e 100%); border: none; border-radius: 16px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 17px; color: #fff; text-align: center; cursor: pointer; line-height: 1.35; letter-spacing: .3px; position: relative; overflow: hidden; animation: cta-pulse 2.2s infinite; box-shadow: 0 8px 30px rgba(22,163,74,.45); text-decoration: none; }
+        .cta-pulse::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.14), transparent); }
+        .cta-pulse:active { transform: scale(.98); }
+        @keyframes cta-pulse { 0%,100% { box-shadow: 0 8px 30px rgba(22,163,74,.45), 0 0 0 0 rgba(22,163,74,.4); } 50% { box-shadow: 0 8px 30px rgba(22,163,74,.45), 0 0 0 12px rgba(22,163,74,.0); } }
+        .cta-sub-text { text-align: center; font-size: 12px; color: var(--text2); font-weight: 700; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .seals-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 16px; }
+        .seal { background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
+        .seal-icon { font-size: 22px; }
+        .seal-label { font-size: 9px; font-weight: 800; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; text-align: center; line-height: 1.4; }
+        .guarantee-box { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 16px; padding: 20px; text-align: center; margin: 20px 0; }
+        .guarantee-icon { font-size: 36px; margin-bottom: 8px; }
+        .guarantee-title { font-size: 16px; font-weight: 900; color: var(--primary-dark); margin-bottom: 6px; }
+        .guarantee-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<!-- LOGO BAR -->
+<div class="logo-bar" id="logo-bar" style="display:none;">
+    <div class="logo">
+        <div class="logo-icon">Pα</div>
+        <div class="logo-text">
+            <span class="logo-p">PROTOCOLO ALPHA</span>
+            <span class="logo-sub">Rendimiento Masculino</span>
+        </div>
+    </div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="progress-wrap" id="progress-wrap">
+    <div class="progress-meta">
+        <span id="prog-step">Paso 1 de 10</span>
+        <span id="prog-pct">10%</span>
+    </div>
+    <div class="prog-bar">
+        <div class="prog-fill" id="prog-fill" style="width:10%"></div>
+    </div>
+</div>
+
+<div class="main">
+
+    <!-- ════════════════════
+         TELA 1 — EDAD
+    ════════════════════ -->
+    <div id="screen-1" class="screen active">
+        <div class="card" style="padding: 32px 24px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="display: inline-flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 20px; padding: 16px 24px; box-shadow: 0 4px 20px rgba(22,163,74,0.12);">
+                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #15803d 0%, #22c55e 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(22,163,74,0.4); flex-shrink: 0;">
+                        <span style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #fff; letter-spacing: 1px; line-height: 1;">Pα</span>
+                    </div>
+                    <div style="text-align: left;">
+                        <div style="font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: #15803d; letter-spacing: 3px; line-height: 1;">PROTOCOLO ALPHA</div>
+                        <div style="font-size: 10px; font-weight: 800; color: #6b7280; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px;">Rendimiento Masculino</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HOOK TIKTOK — directo al dolor -->
+            <div style="background: #f9fafb; border-left: 4px solid #22c55e; border-radius: 0 12px 12px 0; padding: 16px 18px; margin-bottom: 22px; line-height: 1.7; font-size: 15px; color: #374151;">
+                Te han <span style="background: #fef08a; color: #713f12; font-weight: 900; padding: 1px 5px; border-radius: 4px;">mentido</span>: el problema no es lo que tienes, sino lo que tu cuerpo <span style="background: #fef08a; color: #713f12; font-weight: 900; padding: 1px 5px; border-radius: 4px;">bloqueó</span>. No es genética. No es la <span style="background: #fef08a; color: #713f12; font-weight: 900; padding: 1px 5px; border-radius: 4px;">edad</span>. Es <span style="color: #15803d; font-weight: 900;">compresión estructural</span> causada por estrés, hábitos y alimentación.
+            </div>
+
+            <div class="divider"></div>
+            <div class="q-text" style="text-align: center; margin-bottom: 4px;">¿Cuál es tu rango de edad?</div>
+            <div class="q-hint" style="text-align: center; margin-bottom: 14px;">Selecciona para iniciar tu evaluación personalizada</div>
+
+            <div class="age-grid">
+                <div class="age-card" onclick="selectAge('18-30')">
+                    <img src="https://i.im.ge/e4ZT1C/grok-image-d995384f-ce47-4909-845b-bf499b42a5ee.jpg" alt="18-30 años">
+                    <div class="age-card-label"><span>18 – 30 años</span><span>›</span></div>
+                </div>
+                <div class="age-card" onclick="selectAge('31-45')">
+                    <img src="https://i.im.ge/e4ZMH4/grok-image-4b767c5c-d482-40ef-ab74-19815eeaecb1.jpg" alt="31-45 años">
+                    <div class="age-card-label"><span>31 – 45 años</span><span>›</span></div>
+                </div>
+                <div class="age-card" onclick="selectAge('46-55')">
+                    <img src="https://i.im.ge/e4WGaY/grok-image-aa3e0cac-83db-4726-b35c-69d3d61a0242_1_.jpg" alt="46-55 años">
+                    <div class="age-card-label"><span>46 – 55 años</span><span>›</span></div>
+                </div>
+                <div class="age-card" onclick="selectAge('56+')">
+                    <img src="https://i.im.ge/e4WeAD/grok-image-d11e7f82-b9c0-4800-845b-d9907bbc73bc.jpg" alt="56+ años">
+                    <div class="age-card-label"><span>56+ años</span><span>›</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 2 — OBJETIVOS (multi)
+    ════════════════════ -->
+    <div id="screen-2" class="screen">
+        <div class="card">
+            <div class="q-number">Paso 1 de 10</div>
+            <div class="q-text">¿Cuáles son tus objetivos?</div>
+            <div class="q-hint">Puedes elegir más de una opción</div>
+            <div class="multi-opts" id="goals-opts">
+                <div class="multi-opt" onclick="toggleMulti(this,'durar_mas')"><div class="checkbox"></div><span>⏱️ Durar más durante el sexo</span></div>
+                <div class="multi-opt" onclick="toggleMulti(this,'orgasmos')"><div class="checkbox"></div><span>🔥 Tener orgasmos más intensos</span></div>
+                <div class="multi-opt" onclick="toggleMulti(this,'erecciones')"><div class="checkbox"></div><span>💪 Tener erecciones más firmes</span></div>
+            </div>
+            <button class="btn" onclick="confirmMulti('goals-opts', 2, 3)" style="margin-top:20px;">Confirmar y continuar →</button>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 3 — DURACIÓN RELACIÓN
+    ════════════════════ -->
+    <div id="screen-3" class="screen">
+        <div class="card">
+            <div class="q-number">Paso 2 de 10</div>
+            <div class="q-text">¿Cuánto dura en promedio tu relación sexual?</div>
+            <div class="options">
+                <button class="opt" onclick="selectOpt(this,'duracion','menos_2min',3,4)"><div class="opt-icon">⚡</div>Menos de 2 minutos</button>
+                <button class="opt" onclick="selectOpt(this,'duracion','2_7min',3,4)"><div class="opt-icon">⏱️</div>De 2 a 7 minutos</button>
+                <button class="opt" onclick="selectOpt(this,'duracion','7_15min',3,4)"><div class="opt-icon">🕐</div>De 7 a 15 minutos</button>
+                <button class="opt" onclick="selectOpt(this,'duracion','mas_15min',3,4)"><div class="opt-icon">✅</div>Más de 15 minutos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 4 — EYACULACIÓN PRECOZ
+    ════════════════════ -->
+    <div id="screen-4" class="screen">
+        <div class="card">
+            <div class="q-number">Paso 3 de 10</div>
+            <div class="q-text">¿Con qué frecuencia eyaculas antes de lo que quisieras?</div>
+            <div class="options">
+                <button class="opt" onclick="selectOpt(this,'eyac_precoz','nunca',4,5)"><div class="opt-icon">😌</div>Nunca</button>
+                <button class="opt" onclick="selectOpt(this,'eyac_precoz','a_veces',4,5)"><div class="opt-icon">🤔</div>A veces</button>
+                <button class="opt" onclick="selectOpt(this,'eyac_precoz','mayoria',4,5)"><div class="opt-icon">😬</div>La mayoría de las veces</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 5 — FUERZA ERECCIÓN
+    ════════════════════ -->
+    <div id="screen-5" class="screen">
+        <div class="card">
+            <div class="q-number">Paso 4 de 10</div>
+            <div class="q-text">¿Cómo está la firmeza de tu erección durante el sexo?</div>
+            <div class="options">
+                <button class="opt" onclick="selectOpt(this,'fuerza_ereccion','bien_quiero_mas',5,6)"><div class="opt-icon">🙂</div>Está bien, pero quiero mejorar</button>
+                <button class="opt" onclick="selectOpt(this,'fuerza_ereccion','a_veces',5,6)"><div class="opt-icon">😕</div>A veces tengo dificultades</button>
+                <button class="opt" onclick="selectOpt(this,'fuerza_ereccion','frecuente',5,6)"><div class="opt-icon">😟</div>Suelo tener dificultades con frecuencia</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 6 — ERECCIONES MATUTINAS
+    ════════════════════ -->
+    <div id="screen-6" class="screen">
+        <div class="card">
+            <div class="q-number">Paso 5 de 10</div>
+            <div class="q-text">¿Con qué frecuencia tienes erecciones matutinas?</div>
+            <div class="options">
+                <button class="opt" onclick="selectOpt(this,'ereccion_matu','siempre',6,7)"><div class="opt-icon">🌅</div>Siempre</button>
+                <button class="opt" onclick="selectOpt(this,'ereccion_matu','frecuente',6,7)"><div class="opt-icon">🌤️</div>Con frecuencia</button>
+                <button class="opt" onclick="selectOpt(this,'ereccion_matu','raramente',6,7)"><div class="opt-icon">🌥️</div>Raramente</button>
+                <button class="opt" onclick="selectOpt(this,'ereccion_matu','nunca',6,7)"><div class="opt-icon">☁️</div>Nunca</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 7 — ACTIVIDAD FÍSICA
+    ════════════════════ -->
+    <div id="screen-7" class="screen">
+        <div class="card">
+            <div class="q-number">Paso 6 de 10</div>
+            <div class="q-text">¿Cuál es tu nivel de actividad física?</div>
+            <div class="options" id="atv-opts">
+                <button class="opt" onclick="selectAtividade(this,'no','71','La mayoría de nuestros usuarios estaba en la misma situación. El Protocolo Alpha va a crear el hábito correcto para ti.')"><div class="opt-icon">😴</div>No hago ejercicio nunca</button>
+                <button class="opt" onclick="selectAtividade(this,'poco','54','Ya tienes algo de conciencia corporal. El Protocolo potenciará tus resultados.')"><div class="opt-icon">🚶</div>Soy poco activo</button>
+                <button class="opt" onclick="selectAtividade(this,'a_veces','38','¡Buen punto de partida! Con consistencia, tus resultados llegarán más rápido.')"><div class="opt-icon">🏃</div>Hago ejercicio de vez en cuando</button>
+                <button class="opt" onclick="selectAtividade(this,'regular','19','¡Ya estás adelante de la mayoría! El Protocolo va a llevar tu rendimiento al siguiente nivel.')"><div class="opt-icon">🏋️</div>Hago ejercicio regularmente</button>
+            </div>
+            <div id="atv-feedback" style="display:none; margin-top:20px; animation: fadeUp 0.3s ease;">
+                <div style="background:#1d4ed8;border-radius:14px;padding:16px 18px;margin-bottom:8px;">
+                    <div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:4px;">🏃 <span id="atv-pct-text"></span></div>
+                    <div id="atv-msg" style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5;"></div>
+                </div>
+                <div style="font-size:11px;color:var(--text2);margin-bottom:16px;">*Usuarios del Protocolo Alpha que hicieron el test</div>
+                <button class="btn" onclick="goScreen(8)">Entendido →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 8 — ESTADO CIVIL
+    ════════════════════ -->
+    <div id="screen-8" class="screen">
+        <div class="card">
+            <div class="q-number">Paso 7 de 10</div>
+            <div class="q-text">¿Cuál es tu estado civil?</div>
+            <div class="options">
+                <button class="opt" onclick="selectOpt(this,'estado_civil','casado',8,9)"><div class="opt-icon">💍</div>Casado</button>
+                <button class="opt" onclick="selectOpt(this,'estado_civil','novio',8,9)"><div class="opt-icon">💑</div>En pareja</button>
+                <button class="opt" onclick="selectOpt(this,'estado_civil','soltero',8,9)"><div class="opt-icon">🙋</div>Soltero</button>
+                <button class="opt" onclick="selectOpt(this,'estado_civil','prefiero_no',8,9)"><div class="opt-icon">🔒</div>Prefiero no responder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 9 — LIBIDO
+    ════════════════════ -->
+    <div id="screen-9" class="screen">
+        <div class="card">
+            <div class="q-number">Paso 8 de 10</div>
+            <div class="q-text">¿Cómo evalúas tu libido en los últimos 3 meses?</div>
+            <div class="q-hint">1 = Muy baja · 5 = Muy alta</div>
+            <div class="scale-row">
+                <button class="scale-btn" onclick="selectOpt(this,'libido','1',9,10)">1</button>
+                <button class="scale-btn" onclick="selectOpt(this,'libido','2',9,10)">2</button>
+                <button class="scale-btn" onclick="selectOpt(this,'libido','3',9,10)">3</button>
+                <button class="scale-btn" onclick="selectOpt(this,'libido','4',9,10)">4</button>
+                <button class="scale-btn" onclick="selectOpt(this,'libido','5',9,10)">5</button>
+            </div>
+            <div class="scale-labels"><span>Muy baja</span><span>Muy alta</span></div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA 10 — SATISFACCIÓN TAMAÑO (última pregunta)
+    ════════════════════ -->
+    <div id="screen-10" class="screen">
+        <div class="card">
+            <div class="q-number">Última pregunta</div>
+            <div class="q-text">¿Qué tan satisfecho estás con el tamaño de tu <span style="color:var(--primary);font-weight:900;">compañero</span>? 👇</div>
+            <div class="q-hint" style="margin-bottom:4px;">1 = Muy insatisfecho · 5 = Muy satisfecho</div>
+            <div class="scale-row" id="satisf-opts">
+                <button class="scale-btn" onclick="selectSatisf(this,1)">1</button>
+                <button class="scale-btn" onclick="selectSatisf(this,2)">2</button>
+                <button class="scale-btn" onclick="selectSatisf(this,3)">3</button>
+                <button class="scale-btn" onclick="selectSatisf(this,4)">4</button>
+                <button class="scale-btn" onclick="selectSatisf(this,5)">5</button>
+            </div>
+            <div class="scale-labels"><span>Muy insatisfecho</span><span>Muy satisfecho</span></div>
+            <div id="satisf-feedback" style="display:none;margin-top:20px;animation:fadeUp 0.3s ease;">
+                <div id="satisf-box" style="border-radius:14px;padding:18px;margin-bottom:8px;">
+                    <div id="satisf-emoji" style="font-size:32px;margin-bottom:8px;"></div>
+                    <div id="satisf-title" style="font-size:15px;font-weight:900;color:#fff;margin-bottom:6px;line-height:1.4;"></div>
+                    <div id="satisf-msg" style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.6;"></div>
+                </div>
+                <button class="btn" onclick="startLoading()">Ver mi análisis completo →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA LOADING
+    ════════════════════ -->
+    <div id="screen-loading" class="screen">
+        <div class="card" style="text-align:center;padding:32px 24px;">
+            <div style="margin-bottom:28px;">
+                <div style="font-size:48px;margin-bottom:12px;animation:pulse-icon 1.5s ease-in-out infinite;">🧬</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--text);letter-spacing:1px;margin-bottom:6px;">Analizando tu perfil...</div>
+                <div style="font-size:14px;color:var(--text2);font-weight:600;">Un especialista está preparando tu plan exclusivo</div>
+            </div>
+            <div style="background:#e5e7eb;border-radius:99px;height:10px;margin-bottom:28px;overflow:hidden;">
+                <div id="main-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:99px;transition:width 0.4s ease;"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;text-align:left;">
+                <div class="analysis-step" id="step-a1"><div class="step-icon">🩺</div><span style="flex:1;font-size:13px;font-weight:700;">Analizando historial de salud sexual</span><div class="step-bar-wrap"><div class="step-bar" id="bar-a1"></div></div><div class="step-check">✅</div></div>
+                <div class="analysis-step" id="step-a2"><div class="step-icon">⚡</div><span style="flex:1;font-size:13px;font-weight:700;">Evaluando nivel de rendimiento</span><div class="step-bar-wrap"><div class="step-bar" id="bar-a2"></div></div><div class="step-check">✅</div></div>
+                <div class="analysis-step" id="step-a3"><div class="step-icon">🎯</div><span style="flex:1;font-size:13px;font-weight:700;">Identificando puntos de mejora</span><div class="step-bar-wrap"><div class="step-bar" id="bar-a3"></div></div><div class="step-check">✅</div></div>
+                <div class="analysis-step" id="step-a4"><div class="step-icon">📋</div><span style="flex:1;font-size:13px;font-weight:700;">Creando protocolo personalizado</span><div class="step-bar-wrap"><div class="step-bar" id="bar-a4"></div></div><div class="step-check">✅</div></div>
+                <div class="analysis-step" id="step-a5"><div class="step-icon">🏆</div><span style="flex:1;font-size:13px;font-weight:700;">Finalizando tu plan exclusivo</span><div class="step-bar-wrap"><div class="step-bar" id="bar-a5"></div></div><div class="step-check">✅</div></div>
+            </div>
+            <div style="position:relative;min-height:100px;">
+                <div class="testi-mini" id="testi-slide-0"><div class="testi-mini-quote">"En 3 semanas ya noté una diferencia enorme. Más control, más firmeza."</div><div class="testi-mini-author">Carlos M., 34 años — Ciudad de México</div><div class="testi-mini-result">✓ Resultado en menos de 30 días</div></div>
+                <div class="testi-mini" id="testi-slide-1" style="display:none;"><div class="testi-mini-quote">"Nunca imaginé que ejercicios simples pudieran cambiar tanto mi vida íntima."</div><div class="testi-mini-author">Ricardo F., 42 años — Buenos Aires</div><div class="testi-mini-result">✓ Rendimiento elevado en 21 días</div></div>
+                <div class="testi-mini" id="testi-slide-2" style="display:none;"><div class="testi-mini-quote">"Tenía vergüenza de admitir el problema. El protocolo lo resolvió de forma natural."</div><div class="testi-mini-author">Pablo S., 51 años — Bogotá</div><div class="testi-mini-result">✓ Mejora significativa en 25 días</div></div>
+                <div class="testi-mini" id="testi-slide-3" style="display:none;"><div class="testi-mini-quote">"Mi autoconfianza volvió del cero al máximo en pocas semanas."</div><div class="testi-mini-author">Felipe A., 29 años — Santiago</div><div class="testi-mini-result">✓ Confianza totalmente recuperada</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA RESULTADO
+    ════════════════════ -->
+    <div id="screen-resultado" class="screen">
+        <div class="card">
+            <div class="badge">🎯 Tu Resultado Personalizado</div>
+            <div class="headline" style="font-size:26px;margin-bottom:20px;">ANÁLISIS <span class="green">COMPLETO</span></div>
+
+            <!-- ANTES -->
+            <div style="background:#fff1f2;border:1.5px solid #fecdd3;border-radius:14px;padding:18px;margin-bottom:12px;">
+                <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#ef4444;margin-bottom:14px;">❌ SITUACIÓN ACTUAL (ANTES)</div>
+                <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:13px;font-weight:700;color:#6b7280;">Rendimiento sexual</span><span style="font-size:13px;font-weight:900;color:#ef4444;">20%</span></div><div style="height:8px;background:#fee2e2;border-radius:8px;overflow:hidden;"><div style="width:20%;height:100%;background:#f87171;border-radius:8px;"></div></div></div>
+                <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:13px;font-weight:700;color:#6b7280;">Autoconfianza</span><span style="font-size:13px;font-weight:900;color:#ef4444;">15%</span></div><div style="height:8px;background:#fee2e2;border-radius:8px;overflow:hidden;"><div style="width:15%;height:100%;background:#f87171;border-radius:8px;"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:13px;font-weight:700;color:#6b7280;">Control de eyaculación</span><span style="font-size:13px;font-weight:900;color:#ef4444;">37%</span></div><div style="height:8px;background:#fee2e2;border-radius:8px;overflow:hidden;"><div style="width:37%;height:100%;background:#f87171;border-radius:8px;"></div></div></div>
+            </div>
+
+            <div style="text-align:center;font-size:28px;line-height:1;margin:4px 0;">⬇️</div>
+
+            <!-- DEPOIS -->
+            <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:18px;margin-bottom:20px;">
+                <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#15803d;margin-bottom:14px;">✅ CON EL PROTOCOLO ALPHA (DESPUÉS)</div>
+                <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:13px;font-weight:700;color:#6b7280;">Rendimiento sexual</span><span style="font-size:13px;font-weight:900;color:#16a34a;">90%</span></div><div style="height:8px;background:#dcfce7;border-radius:8px;overflow:hidden;"><div id="after-1" style="width:0%;height:100%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:8px;transition:width 1.2s ease;"></div></div></div>
+                <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:13px;font-weight:700;color:#6b7280;">Autoconfianza</span><span style="font-size:13px;font-weight:900;color:#16a34a;">87%</span></div><div style="height:8px;background:#dcfce7;border-radius:8px;overflow:hidden;"><div id="after-2" style="width:0%;height:100%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:8px;transition:width 1.2s ease;"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:13px;font-weight:700;color:#6b7280;">Control de eyaculación</span><span style="font-size:13px;font-weight:900;color:#16a34a;">91%</span></div><div style="height:8px;background:#dcfce7;border-radius:8px;overflow:hidden;"><div id="after-3" style="width:0%;height:100%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:8px;transition:width 1.2s ease;"></div></div></div>
+            </div>
+
+            <div class="info-box" style="text-align:center;">🎉 <strong>¡Tu perfil es compatible con el Protocolo Alpha!</strong><br>Basado en tus respuestas, tienes alto potencial de mejora con nuestro método.</div>
+            <button class="btn" onclick="goScreen('oferta')">🚀 Quiero alcanzar este potencial</button>
+        </div>
+    </div>
+
+    <!-- ════════════════════
+         TELA OFERTA
+    ════════════════════ -->
+    <div id="screen-oferta" class="screen">
+        <div class="offer-hero">
+            <div class="offer-hero-eyebrow">✅ Plan Personalizado Generado</div>
+            <div class="offer-hero-title">Tu Plan de Entrenamiento<br><span>P-Alpha está Listo!</span></div>
+        </div>
+
+        <div class="delivery-card">
+            <div class="delivery-card-label">Lo que recibes</div>
+            <div class="offer-item"><div class="offer-check">✔</div><div class="offer-text"><div class="offer-title">Programa Avanzado de Ejercicios de Kegel</div><div class="offer-desc">3 sesiones diarias estructuradas. Recomendamos al menos 2 sesiones por día para acelerar los resultados.</div></div></div>
+            <div class="offer-item"><div class="offer-check">✔</div><div class="offer-text"><div class="offer-title">Entrenamiento Específico Guiado</div><div class="offer-desc">Fortalece regiones que aumentan tu deseo y mejoran directamente tu rendimiento sexual.</div></div></div>
+            <div class="offer-item"><div class="offer-check">✔</div><div class="offer-text"><div class="offer-title">Técnicas de Respiración Táctica</div><div class="offer-desc">Reducen la tensión física y mental, aumentando tu control y enfoque en el momento decisivo.</div></div></div>
+            <div class="offer-item"><div class="offer-check">✔</div><div class="offer-text"><div class="offer-title">Orientaciones de Especialistas en Sexualidad</div><div class="offer-desc">Mejora tu rendimiento y trae más conexión a tu vida sexual.</div></div></div>
+            <div class="lifetime-badge"><div style="font-size:22px;flex-shrink:0;">♾️</div><div><div class="lifetime-badge-text">Acceso de por vida a la Plataforma</div><div class="lifetime-badge-sub">Sin mensualidad. Accede para siempre desde cualquier dispositivo.</div></div></div>
+        </div>
+
+        <div class="bonus-card">
+            <div class="bonus-ribbon">🎁 Bonos Premium — Incluidos</div>
+            <div class="bonus-headline">AL COMPRAR HOY,<br><span>RECIBES +4 BONOS EXCLUSIVOS:</span></div>
+            <div class="bonus-item"><div class="bonus-emoji-wrap">💪</div><div class="bonus-item-body"><div class="bonus-item-name">Ejercicios de Expansión Tisular</div><div class="bonus-item-desc">Aumenta y engrosa tu compañero con técnicas seguras.</div></div><div class="bonus-gratis">GRATIS</div></div>
+            <div class="bonus-item"><div class="bonus-emoji-wrap">👑</div><div class="bonus-item-body"><div class="bonus-item-name">Guía del Macho Alfa</div><div class="bonus-item-desc">Creado por mujeres con técnicas para que te persigan a ti.</div></div><div class="bonus-gratis">GRATIS</div></div>
+            <div class="bonus-item"><div class="bonus-emoji-wrap">🍃</div><div class="bonus-item-body"><div class="bonus-item-name">Recetas de Potencia Casera</div><div class="bonus-item-desc">Ingredientes que ya tienes en casa para elevar tu potencia.</div></div><div class="bonus-gratis">GRATIS</div></div>
+            <div class="bonus-item"><div class="bonus-emoji-wrap">🔥</div><div class="bonus-item-body"><div class="bonus-item-name">Técnica del Bicarbonato</div><div class="bonus-item-desc">Receta viral que está transformando a los hombres que ya la usaron.</div></div><div class="bonus-gratis">GRATIS</div></div>
+        </div>
+
+        <div class="urgency-strip">
+            <div class="urgency-icon">⏳</div>
+            <div class="urgency-text"><strong>Atención:</strong> Esta oferta con los 4 bonos está disponible <strong>solo en esta página</strong>. Al salir, el descuento y los bonos se eliminan automáticamente.</div>
+        </div>
+
+        <button class="cta-pulse" onclick="checkout()">🔓 QUIERO MI ACCESO INMEDIATO</button>
+        <div class="cta-sub-text">🔒 Pago 100% seguro y encriptado</div>
+
+        <div class="seals-row">
+            <div class="seal"><div class="seal-icon">🔐</div><div class="seal-label">Compra 100% Segura</div></div>
+            <div class="seal"><div class="seal-icon">⚡</div><div class="seal-label">Acceso Inmediato</div></div>
+            <div class="seal"><div class="seal-icon">🛡️</div><div class="seal-label">Garantía 7 Días</div></div>
+        </div>
+
+        <div class="guarantee-box" style="margin-top:16px;">
+            <div class="guarantee-icon">🛡️</div>
+            <div class="guarantee-title">Garantía Total de 7 Días</div>
+            <div class="guarantee-desc">¿No quedaste satisfecho? Te devolvemos el 100% de tu dinero.<br>Sin preguntas, sin burocracia.</div>
+        </div>
+
+        <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--text2);font-weight:700;">Adquiere ahora y recupera tu masculinidad en semanas</div>
+        <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text2);">🔒 Pago 100% seguro y discreto</div>
+    </div>
+
+</div><!-- /main -->
+
+<script>
+// ── ESTADO ──
+let answers = {};
+const QUIZ_SCREENS = [2,3,4,5,6,7,8,9,10];
+
+// ── PROGRESS ──
+function updateProgress(n) {
+    const wrap = document.getElementById('progress-wrap');
+    const fill = document.getElementById('prog-fill');
+    const step = document.getElementById('prog-step');
+    const pct  = document.getElementById('prog-pct');
+    const idx = QUIZ_SCREENS.indexOf(n);
+    if (idx >= 0) {
+        if(wrap) wrap.classList.add('show');
+        const p = Math.round(((idx + 1) / QUIZ_SCREENS.length) * 100);
+        if(fill) fill.style.width = p + '%';
+        if(step) step.textContent = 'Paso ' + (idx + 1) + ' de ' + QUIZ_SCREENS.length;
+        if(pct)  pct.textContent  = p + '%';
+    } else {
+        if(wrap) wrap.classList.remove('show');
+    }
+}
+
+// ── NAVEGAR ──
+function goScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById('screen-' + n);
+    if (el) el.classList.add('active');
+    window.scrollTo(0, 0);
+
+    const logoBar = document.getElementById('logo-bar');
+    if (logoBar) logoBar.style.display = (n === 1) ? 'none' : 'flex';
+
+    updateProgress(typeof n === 'number' ? n : -1);
+}
+
+// ── HANDLERS ──
+function selectOpt(el, key, val, currentScreen, nextScreen) {
+    const parent = el.closest('.options, .scale-row');
+    if (parent) parent.querySelectorAll('.opt, .scale-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    answers[key] = val;
+    if (nextScreen !== null && nextScreen !== undefined) {
+        setTimeout(() => goScreen(nextScreen), 250);
+    }
+}
+
+function toggleMulti(el, key) {
+    el.classList.toggle('selected');
+    const cb = el.querySelector('.checkbox');
+    if(cb) cb.textContent = el.classList.contains('selected') ? '✓' : '';
+    if (!answers.goals) answers.goals = [];
+    if (el.classList.contains('selected')) {
+        if (!answers.goals.includes(key)) answers.goals.push(key);
+    } else {
+        answers.goals = answers.goals.filter(k => k !== key);
+    }
+}
+
+function confirmMulti(containerId, currentS, nextS) {
+    if (!answers.goals || answers.goals.length === 0) {
+        alert('Por favor, selecciona al menos una opción.');
+        return;
+    }
+    goScreen(nextS);
+}
+
+function selectAtividade(el, val, pct, msg) {
+    document.querySelectorAll('#atv-opts .opt').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    answers.actividad_fisica = val;
+    const pctEl = document.getElementById('atv-pct-text');
+    if (val === 'no') {
+        if(pctEl) pctEl.textContent = '💪 ¡No te preocupes — todo comienzo tiene un punto de partida!';
+    } else {
+        if(pctEl) pctEl.textContent = 'Estás adelante del ' + pct + '% de los usuarios';
+    }
+    const msgEl = document.getElementById('atv-msg');
+    if(msgEl) msgEl.textContent = msg;
+    const fb = document.getElementById('atv-feedback');
+    if(fb) fb.style.display = 'block';
+    setTimeout(() => { const f = document.getElementById('atv-feedback'); if(f) f.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+}
+
+function selectSatisf(el, val) {
+    document.querySelectorAll('#satisf-opts .scale-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    answers.satisfaccion_tamano = val;
+    const configs = {
+        1:{bg:'background:linear-gradient(135deg,#7f1d1d,#991b1b);border:1px solid rgba(239,68,68,0.4);',emoji:'😔',title:'Entendemos lo mucho que eso pesa...',msg:'Muchos hombres pasan años sintiéndose así sin saber que existe solución. Al final de esta evaluación tenemos una sorpresa especial para ti. 🎁'},
+        2:{bg:'background:linear-gradient(135deg,#7c2d12,#9a3412);border:1px solid rgba(249,115,22,0.4);',emoji:'😕',title:'Mereces sentirte mucho mejor...',msg:'No tiene que ser así. Tenemos una sorpresa especial esperándote. 🎁'},
+        3:{bg:'background:linear-gradient(135deg,#713f12,#854d0e);border:1px solid rgba(234,179,8,0.4);',emoji:'😐',title:'A mitad del camino...',msg:'Al final de la evaluación tenemos una sorpresa que te mostrará exactamente qué falta. 🎁'},
+        4:{bg:'background:linear-gradient(135deg,#14532d,#166534);border:1px solid rgba(34,197,94,0.3);',emoji:'🙂',title:'¡Casi ahí — pero lo mejor está por venir!',msg:'Existe un próximo nivel que pocos hombres alcanzan. Al final hay una sorpresa. 🎁'},
+        5:{bg:'background:linear-gradient(135deg,#064e3b,#065f46);border:2px solid rgba(34,197,94,0.5);',emoji:'🏆',title:'¡Felicidades! ¡Vas a convertirte en una máquina! 🔥',msg:'Ya tienes la mentalidad correcta. Con el Protocolo Alpha vas a potenciar todavía más tus resultados.'}
+    };
+    const c = configs[val];
+    const box = document.getElementById('satisf-box');
+    if(box) box.setAttribute('style', c.bg + ' padding:18px;');
+    document.getElementById('satisf-emoji').textContent = c.emoji;
+    document.getElementById('satisf-title').textContent = c.title;
+    document.getElementById('satisf-msg').textContent   = c.msg;
+    document.getElementById('satisf-feedback').style.display = 'block';
+    setTimeout(() => { const f = document.getElementById('satisf-feedback'); if(f) f.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+}
+
+function selectAge(range) {
+    answers.edad = range;
+    goScreen(2);
+}
+
+// ── LOADING ──
+function startLoading() {
+    goScreen('loading');
+    runAnalysis();
+}
+
+function runAnalysis() {
+    const bars  = ['bar-a1','bar-a2','bar-a3','bar-a4','bar-a5'];
+    const steps = ['step-a1','step-a2','step-a3','step-a4','step-a5'];
+    const testis = ['testi-slide-0','testi-slide-1','testi-slide-2','testi-slide-3'];
+    let tIdx = 0;
+    const TOTAL = 5000;
+
+    bars.forEach((barId, i) => {
+        setTimeout(() => {
+            const bar = document.getElementById(barId);
+            if (bar) bar.style.width = '100%';
+            setTimeout(() => {
+                const step = document.getElementById(steps[i]);
+                if (step) step.classList.add('step-done');
+            }, 800);
+        }, i * (TOTAL / bars.length));
+    });
+
+    const mainBar = document.getElementById('main-progress-bar');
+    let pct = 0;
+    const progInterval = setInterval(() => {
+        pct += 1;
+        if (mainBar) mainBar.style.width = pct + '%';
+        if (pct >= 100) clearInterval(progInterval);
+    }, TOTAL / 100);
+
+    const testiInterval = setInterval(() => {
+        document.getElementById(testis[tIdx]).style.display = 'none';
+        tIdx = (tIdx + 1) % testis.length;
+        document.getElementById(testis[tIdx]).style.display = 'block';
+    }, 1250);
+
+    setTimeout(() => {
+        clearInterval(testiInterval);
+        clearInterval(progInterval);
+        goScreen('resultado');
+        animateResults();
+    }, TOTAL);
+}
+
+function animateResults() {
+    setTimeout(() => { document.getElementById('after-1').style.width = '90%'; }, 300);
+    setTimeout(() => { document.getElementById('after-2').style.width = '87%'; }, 500);
+    setTimeout(() => { document.getElementById('after-3').style.width = '91%'; }, 700);
+}
+
+// ── CHECKOUT ──
+function checkout() {
+    window.location.href = 'https://go.centerpag.com/PPU38CQBKAI';
+}
+</script>
+
+</body>
+</html>
